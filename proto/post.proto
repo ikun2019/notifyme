@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package post;
+
+import "google/protobuf/empty.proto";
+
+service PostService {
+  rpc GetPostCountByAuthor (UserIdRequest) returns (PostCountResponse);
+  rpc CreatePost (CreatePostRequest) returns (PostResponse);
+  rpc ListPosts (google.protobuf.Empty) returns (ListPostsResponse);
+}
+
+// Request
+message UserIdRequest {
+  string author_id = 1;
+}
+message CreatePostRequest {
+  string author_id = 1;
+  string content = 2;
+  string link = 3;
+  string image_url = 4;
+  TagIds tag_ids = 5;
+}
+
+// Response
+message PostCountResponse {
+  int32 count = 1;
+}
+message PostResponse {
+  string id = 1;
+  string author_id = 2;
+  string content = 3;
+  string link = 4;
+  string image_url = 5;
+  string created_at = 6;
+}
+message ListPostsResponse {
+  repeated PostResponse posts = 1;
+}
+
+// Type
+message TagIds {
+  repeated string ids = 1;
+}

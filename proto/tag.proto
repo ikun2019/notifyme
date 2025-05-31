@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package tag;
+
+service TagService {
+  rpc GetOrCreateTags (GetOrCreateTagsRequest) returns (GetOrCreateTagsResponse);
+}
+
+// Request
+message GetOrCreateTagsRequest {
+  repeated string names = 1;
+}
+
+// Response
+message GetOrCreateTagsResponse {
+  repeated Tag tags = 1;
+}
+
+// Type
+message Tag {
+  string id = 1;
+  string name = 2;
+}

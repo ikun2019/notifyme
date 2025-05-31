@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package thank;
+
+service ThankService {
+  rpc GetThanksCountForUser (UserIdRequest) returns (ThanksCountResponse);
+}
+
+// Request
+message UserIdRequest {
+  string user_id = 1;
+}
+
+// Response
+message ThanksCountResponse {
+  int32 count = 1;
+}
