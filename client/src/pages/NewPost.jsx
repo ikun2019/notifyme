@@ -43,7 +43,6 @@ const NewPost = ({ isPremium = true }) => {
 				formData.append('image', image);
 			}
 			await axios.post('/api/posts', formData, {
-				headers: { 'Content-Type': 'multipart/form-data' },
 				withCredentials: true,
 			});
 			setText('');

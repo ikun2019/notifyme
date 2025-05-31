@@ -13,14 +13,14 @@ const shutdown = (server) => {
 };
 exports.startServer = () => {
   const caCert = fs.readFileSync('/ssl/ca/ca.crt');
-  const serverKey = fs.readFileSync('/ssl/post_service/post_service.key');
-  const serverCert = fs.readFileSync('/ssl/post_service/post_service.crt');
+  const serverKey = fs.readFileSync('/ssl/thank_service/thank_service.key');
+  const serverCert = fs.readFileSync('/ssl/thank_service/thank_service.crt');
 
   const server = new grpc.Server();
   const creds = grpc.ServerCredentials.createSsl(caCert, [{
     private_key: serverKey,
     cert_chain: serverCert
-  }]);
+  }], true);
 
   server.addService(ThankServiceService, {
     GetThanksCountForUser: getThanksCountForUser,

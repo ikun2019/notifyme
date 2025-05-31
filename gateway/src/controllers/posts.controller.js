@@ -10,6 +10,7 @@ const supabase = require('../utils/supabase');
 
 // * POST => /api/posts
 exports.createPost = async (req, res) => {
+  console.log('🛜 CreatePpst');
   const { content, link, authorId, tags } = req.body;
   const imageFile = req.file;
   let imageUrl = null;
@@ -58,6 +59,7 @@ exports.createPost = async (req, res) => {
     const post = await new Promise((resolve, reject) => {
       postServiceClient.createPost(request, (err, response) => {
         if (err) {
+          console.error('gRPC error:', err);
           reject(err);
         }
         resolve(response);
@@ -72,6 +74,7 @@ exports.createPost = async (req, res) => {
       createdAt: post.getCreatedAt()
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: error.message });
   }
 };

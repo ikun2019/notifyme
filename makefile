@@ -23,4 +23,4 @@ grpc-certs:
 		--platform linux/amd64 \
 		-v $(shell pwd)/scripts:/scripts \
 		-v $(shell pwd)/ssl:/ssl \
-		${SCRIPTS_IMAGE} bash /scripts/ssl.sh grpc post_service tag_service thank_service user_service
+		${SCRIPTS_IMAGE} bash /scripts/ssl.sh grpc gateway post_service tag_service thank_service user_service

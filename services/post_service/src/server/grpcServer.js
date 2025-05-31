@@ -21,7 +21,7 @@ exports.startServer = () => {
   const creds = grpc.ServerCredentials.createSsl(caCert, [{
     private_key: serverKey,
     cert_chain: serverCert
-  }]);
+  }], true);
 
   server.addService(PostServiceService, {
     getPostCountByAuthor: getPostCountByAuthor,
