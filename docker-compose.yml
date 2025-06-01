@@ -31,6 +31,10 @@ services:
       - post_service
       - thank_service
       - db
+      - kafka1
+      - kafka2
+      - kafka3
+      - redis
   user_service:
     container_name: user_service-container
     build:
@@ -95,6 +99,47 @@ services:
       - .postgres.env
     volumes:
       - pg_data:/var/lib/postgresql/data
+  redis:
+    image: redis:7.2
+  zookeeper:
+    image: zookeeper:3.9
+    container_name: zookeeper-container
+  kafka1:
+    container_name: kafka1-container
+    build:
+      context: ./infra/kafka1
+      dockerfile: Dockerfile
+    volumes:
+      - ./infra/kafka1/config:/opt/kafka/config
+      - ./ssl:/ssl
+    environment:
+      KAFKA_HEAP_OPTS: '-Xmx512M -Xms512M'
+    depends_on:
+      - zookeeper
+  kafka2:
+    container_name: kafka2-container
+    build:
+      context: ./infra/kafka2
+      dockerfile: Dockerfile
+    volumes:
+      - ./infra/kafka2/config:/opt/kafka/config
+      - ./ssl:/ssl
+    environment:
+      KAFKA_HEAP_OPTS: '-Xmx512M -Xms512M'
+    depends_on:
+      - zookeeper
+  kafka3:
+    container_name: kafka3-container
+    build:
+      context: ./infra/kafka3
+      dockerfile: Dockerfile
+    volumes:
+      - ./infra/kafka3/config:/opt/kafka/config
+      - ./ssl:/ssl
+    environment:
+      KAFKA_HEAP_OPTS: '-Xmx512M -Xms512M'
+    depends_on:
+      - zookeeper
   # prometheus:
   #   image: prom/prometheus
   #   volumes:

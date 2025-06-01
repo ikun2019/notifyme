@@ -17,6 +17,7 @@
 	"dependencies": {
 		"@grpc/grpc-js": "^1.13.4",
 		"@prisma/client": "^6.8.2",
-		"google-protobuf": "^3.21.4"
+		"google-protobuf": "^3.21.4",
+		"kafkajs": "^2.2.4"
 	}
 }

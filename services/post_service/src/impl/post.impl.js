@@ -2,6 +2,7 @@ const grpc = require('@grpc/grpc-js');
 const prisma = require('../utils/prismaClient');
 
 const { PostCountResponse, PostResponse, ListPostsResponse } = require('../../proto/post_pb');
+const { sendPostCreatedEvent } = require('../utils/kafka/kafkaProducer');
 
 exports.getPostCountByAuthor = async (call, callback) => {
   const { author_id } = call.request.toObject();
@@ -43,6 +44,8 @@ exports.createPost = async (call, callback) => {
         tags: true
       }
     });
+    console.log('post =>', post);
+    await sendPostCreatedEvent('post_created', post);
     const response = new PostResponse();
     response.setId(post.id);
     response.setAuthorId(post.authorId);

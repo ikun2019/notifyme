@@ -3,6 +3,7 @@ const fs = require('fs');
 
 const { PostServiceService } = require('../../proto/post_grpc_pb');
 const { getPostCountByAuthor, createPost, listPosts } = require('../impl/post.impl');
+const { connectKafka } = require('../utils/kafka/kafkaProducer');
 
 const shutdown = (server) => {
   if (server) {
@@ -31,6 +32,7 @@ exports.startServer = () => {
 
   server.bindAsync('0.0.0.0:50051', creds, (err) => {
     if (err) return shutdown(server);
+    connectKafka();
     server.start();
     console.log('🟢 PostService gRPC server is running');
   });
