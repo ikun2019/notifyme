@@ -3,36 +3,6 @@ import { Link } from 'react-router-dom';
 
 import axios from '../utils/axiosClient';
 
-// const notifications = [
-// 	{
-// 		id: 1,
-// 		tags: ['#Node.js', 'Docker', 'Express'],
-// 		text: 'Developing a REST API with Express and Docker',
-// 		link: 'example.com',
-// 		image: 'https://placehold.jp/600x300.png', // ← 画像追加
-// 		time: '2h ago',
-// 	},
-// 	{
-// 		id: 2,
-// 		tags: ['#English', 'Redis'],
-// 		text: 'Great resource for learning Redis in English!',
-// 		link: 'example.com',
-// 		time: '5h ago',
-// 	},
-// 	{
-// 		id: 3,
-// 		tags: ['#Docker', 'Express'],
-// 		text: 'Leveraged Docker for seamless deployment of an Express app',
-// 		time: 'Apr 18',
-// 	},
-// 	{
-// 		id: 4,
-// 		tags: ['#Microservices'],
-// 		text: 'Article on microservices architecture basics',
-// 		time: 'Apr 17',
-// 	},
-// ];
-
 const Notifications = () => {
 	const [notifications, setNotifications] = useState([]);
 	useEffect(() => {
@@ -41,7 +11,22 @@ const Notifications = () => {
 			.then((response) => setNotifications(response.data))
 			.catch((err) => console.error('❌ getAllPosts Error:', err));
 	}, []);
-	console.log(notifications);
+
+	useEffect(() => {
+		const socket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
+		socket.onmessage = (event) => {
+			try {
+				const newNotification = JSON.parse(event.data);
+				setNotifications((prev) => [newNotification, ...prev]);
+			} catch (error) {
+				console.error('❌ WebSocket Error:', error);
+			}
+		};
+		return () => {
+			socket.close();
+		};
+	}, []);
+
 	return (
 		<div className="max-w-xl mx-auto px-4 py-6">
 			<div className="flex items-center justify-between mb-4">
