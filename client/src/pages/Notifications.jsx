@@ -42,14 +42,14 @@ const Notifications = () => {
 			{notifications.map((item) => (
 				<div key={item.id} className="bg-white border rounded-lg p-4 mb-4 shadow-sm">
 					<div className="flex flex-wrap gap-2 mb-2">
-						{/* {item.tags.map((tag, i) => (
+						{item.tags.map((tag, i) => (
 							<span
 								key={i}
 								className="bg-blue-100 text-blue-600 text-xs font-medium px-2 py-1 rounded-full"
 							>
-								{tag}
+								{tag.name}
 							</span>
-						))} */}
+						))}
 						<span className="ml-auto text-sm text-gray-400">{item.createdAt}</span>
 					</div>
 

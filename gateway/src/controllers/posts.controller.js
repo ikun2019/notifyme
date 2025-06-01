@@ -93,12 +93,17 @@ exports.getAllPosts = async (req, res) => {
         resolve(response);
       });
     });
+
     const posts = postsResponse.getPostsList().map((post) => ({
       id: post.getId(),
       authorId: post.getAuthorId(),
       content: post.getContent(),
       link: post.getLink(),
       imageUrl: post.getImageUrl(),
+      tags: post.getTagsList().map((tag) => ({
+        id: tag.getId(),
+        name: tag.getName()
+      })),
       createdAt: post.getCreatedAt()
     }));
     return res.status(200).json(posts);

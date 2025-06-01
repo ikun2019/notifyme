@@ -1,7 +1,7 @@
 const grpc = require('@grpc/grpc-js');
 const prisma = require('../utils/prismaClient');
 
-const { PostCountResponse, PostResponse, ListPostsResponse } = require('../../proto/post_pb');
+const { PostCountResponse, PostResponse, ListPostsResponse, Tag } = require('../../proto/post_pb');
 const { sendPostCreatedEvent } = require('../utils/kafka/kafkaProducer');
 
 exports.getPostCountByAuthor = async (call, callback) => {
@@ -65,9 +65,15 @@ exports.createPost = async (call, callback) => {
 exports.listPosts = async (call, callback) => {
   try {
     const posts = await prisma.post.findMany({
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
+      include: {
+        tags: {
+          include: {
+            tag: true
+          }
+        }
+      }
     });
-
     const response = new ListPostsResponse();
     posts.forEach((post) => {
       const item = new PostResponse();
@@ -77,6 +83,12 @@ exports.listPosts = async (call, callback) => {
       item.setLink(post.link);
       item.setImageUrl(post.imageUrl);
       item.setCreatedAt(post.createdAt.toISOString());
+      post.tags.forEach((tag) => {
+        const tagItem = new Tag();
+        tagItem.setId(tag.tag.id);
+        tagItem.setName(tag.tag.name);
+        item.addTags(tagItem);
+      })
       response.addPosts(item);
     });
     callback(null, response);

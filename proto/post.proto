@@ -33,6 +33,7 @@ message PostResponse {
   string link = 4;
   string image_url = 5;
   string created_at = 6;
+  repeated Tag tags = 7;
 }
 message ListPostsResponse {
   repeated PostResponse posts = 1;
@@ -41,4 +42,8 @@ message ListPostsResponse {
 // Type
 message TagIds {
   repeated string ids = 1;
+}
+message Tag {
+  string id = 1;
+  string name = 2;
 }
