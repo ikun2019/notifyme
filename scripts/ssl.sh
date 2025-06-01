@@ -29,7 +29,7 @@ elif [ "$TYPE" == "broker" ]; then
     mkdir -p /ssl/${CN}
     openssl genrsa -out /ssl/${CN}/${CN}.key 4096
     openssl req -new -key /ssl/${CN}/${CN}.key -out /ssl/${CN}/${CN}.csr -subj "/CN=${CN}"
-    openssl x509 -req -in /ssl/${CN}/${CN}.csr -CA ${CA_DIR}/ca.crt -CAkey ${CA_DIR}/ca.key -CAcreateserial -out /ssl/${CN}/${CN}.crt -days 365 -sha256
+    openssl x509 -req -in /ssl/${CN}/${CN}.csr -CA ${CA_DIR}/ca.crt -CAkey ${CA_DIR}/ca.key -CAcreateserial -out /ssl/${CN}/${CN}.crt -days 365 -sha256 -extfile <(printf "subjectAltName=DNS:${CN}")
     echo "✅ Kafka証明書の作成完了"
   # pkcs12に変更
     openssl pkcs12 -export \

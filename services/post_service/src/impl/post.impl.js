@@ -44,8 +44,7 @@ exports.createPost = async (call, callback) => {
         tags: true
       }
     });
-    console.log('post =>', post);
-    await sendPostCreatedEvent('post_created', post);
+    await sendPostCreatedEvent('post-created', post);
     const response = new PostResponse();
     response.setId(post.id);
     response.setAuthorId(post.authorId);

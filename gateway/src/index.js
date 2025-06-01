@@ -72,6 +72,8 @@ app.use((req, res, next) => {
 app.use('/api/users', usersRouter);
 app.use('/api/posts', postsRouter);
 
+require('./utils/kafka/kafkaToRedis');
+
 app.get('/metrics', async (req, res) => {
   res.set('Content-Type', register.contentType);
   res.end(await register.metrics());
