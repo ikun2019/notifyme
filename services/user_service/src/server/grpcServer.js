@@ -2,7 +2,7 @@ const grpc = require('@grpc/grpc-js');
 const fs = require('fs');
 
 const { UserServiceService } = require('../../proto/user_grpc_pb');
-const { getUserInfo } = require('../impl/user.impl');
+const { getUserInfo, createUserProfile, updateUserProfile } = require('../impl/user.impl');
 
 const shutdown = (server) => {
   if (server) {
@@ -24,7 +24,9 @@ exports.startServer = () => {
   }], true);
 
   server.addService(UserServiceService, {
-    getUserInfo: getUserInfo
+    getUserInfo: getUserInfo,
+    createUserProfile: createUserProfile,
+    updateUserProfile: updateUserProfile,
   });
 
   server.bindAsync('0.0.0.0:50051', creds, (err) => {

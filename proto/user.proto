@@ -4,11 +4,18 @@ package user;
 
 service UserService {
   rpc GetUserInfo (UserIdRequest) returns (UserInfoResponse);
+  rpc CreateUserProfile (UserIdRequest) returns (UserProfileResponse);
+  rpc UpdateUserProfile (UpdateUserRequest) returns (UserInfoResponse);
 }
 
 // Request
 message UserIdRequest {
   string user_id = 1;
+}
+message UpdateUserRequest {
+  string user_id = 1;
+  string name = 2;
+  string avatar_url = 3;
 }
 
 // Response
@@ -16,8 +23,21 @@ message UserInfoResponse {
   string id = 1;
   string email = 2;
   string name = 3;
-  string avater_url = 4;
-  string created_at = 5;
-  int32 post_count = 6;
+  string avatar_url = 4;
+  int32 post_count = 5;
+  repeated Tag followed_tags = 6;
   int32 thanks_received = 7;
+  string created_at = 8;
+}
+message UserProfileResponse {
+  string user_id = 1;
+  string avatar_url = 2;
+  int32 post_count = 3;
+  repeated Tag followed_tags = 4;
+  int32 thanks_received = 5;
+}
+// Type
+message Tag {
+  string id = 1;
+  string name = 2;
 }

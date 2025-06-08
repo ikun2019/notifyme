@@ -16,6 +16,7 @@ const app = express();
 // * Expressの設定
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
+app.set('trust proxy', 1);
 
 // * API Security Middleware
 app.use(cors({

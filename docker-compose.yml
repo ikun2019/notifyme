@@ -54,6 +54,8 @@ services:
     platform: linux/amd64
     env_file:
       - .user.env
+    ports:
+      - '5556:5555'
     volumes:
       - ./services/user_service:/app
       - ./ssl:/ssl
@@ -106,6 +108,7 @@ services:
     image: postgres:15.4
     container_name: notifyme_db
     platform: linux/amd64
+    restart: always
     env_file:
       - .postgres.env
     volumes:
