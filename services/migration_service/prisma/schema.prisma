@@ -5,14 +5,16 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["multiSchema"]
+  output          = "../../generated"
+  binaryTargets   = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
-  schemas = ["post","tag", "thank"]
+  url = env("DATABASE_URL")
+  schemas =["post","tag","thank","user"]
 }
 
 model Post {
@@ -26,13 +28,6 @@ model Post {
   @@schema("post")
 }
 
-model Tag {
-  id String @id @default(uuid())
-  name String @unique
-  posts PostTag[]
-  @@schema("tag")
-}
-
 model PostTag {
   postId String
   tagId String
@@ -42,6 +37,14 @@ model PostTag {
   @@schema("post")
 }
 
+model Tag {
+  id String @id
+  name String
+  posts PostTag[]
+  followers UserFollowedTag[]
+  @@schema("tag")
+}
+
 model Thank {
   id String @id @default(uuid())
   messageId String
@@ -49,4 +52,23 @@ model Thank {
   toUserId String
   createdAt DateTime @default(now())
   @@schema("thank")
+}
+
+model Profile {
+  id String @id @default(uuid())
+  userId String @unique
+  avatar_url String?
+  post_count Int @default(0)
+  followed_tags UserFollowedTag[]
+  thanks_received Int @default(0)
+  @@schema("user")
+}
+
+model UserFollowedTag {
+  profileId String
+  tagId String
+  profile Profile @relation(fields: [profileId], references: [id])
+  tag Tag @relation(fields: [tagId], references: [id])
+  @@id([profileId, tagId])
+  @@schema("user")
 }
