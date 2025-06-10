@@ -15,11 +15,13 @@ exports.getUser = async (req, res) => {
       });
     });
 
+    console.log(user.toObject());
+
     res.status(200).json({
       id: user.getId(),
       email: user.getEmail(),
       name: user.getName(),
-      avaterUrl: user.getAvatarUrl(),
+      avatarUrl: user.getAvatarUrl(),
       postCount: user.getPostCount(),
       followedTags: user.getFollowedTagsList().map((tag) => ({
         id: tag.getId(),
@@ -65,13 +67,14 @@ exports.updateUser = async (req, res) => {
   const { userId } = req.params;
   const { name } = req.body;
   const avatarFile = req.file;
-  let avatarUrl = null;
+  let avatarUrl = undefined;
   try {
     if (avatarFile) {
       const fileExt = avatarFile.originalname.split('.').pop();
       const fileName = `${userId}.${fileExt}`;
       const { error } = await supabase.storage.from('avatars').upload(`images/${fileName}`, avatarFile.buffer, {
-        contentType: avatarFile.mimetype
+        contentType: avatarFile.mimetype,
+        upsert: true,
       });
 
       if (error) {
@@ -84,7 +87,9 @@ exports.updateUser = async (req, res) => {
     const request = new UpdateUserRequest();
     request.setUserId(userId);
     request.setName(name);
-    request.setAvatarUrl(avatarUrl);
+    if (avatarUrl !== undefined) {
+      request.setAvatarUrl(avatarUrl);
+    }
     const newProfile = await new Promise((resolve, reject) => {
       userServiceClient.updateUserProfile(request, (err, response) => {
         if (err) return reject(err);

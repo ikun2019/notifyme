@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import axios from '../utils/axiosClient';
+import { updateUserProfile } from '../store/modules/authSlice';
 import MinimumLoadingSpinner from '../components/MinimumLoadingSpinner';
 
 const ProfileEdit = () => {
@@ -12,6 +13,7 @@ const ProfileEdit = () => {
 		previewUrl: '',
 	});
 	const { user } = useSelector((state) => state.auth);
+	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -21,7 +23,7 @@ const ProfileEdit = () => {
 				...prev,
 				name: result.data.name,
 				avatarFile: null,
-				previewUrl: '',
+				previewUrl: result.data.avatarUrl || '',
 			}));
 		});
 	}, [user?.id]);
@@ -49,11 +51,18 @@ const ProfileEdit = () => {
 			data.append('avatar', formData.avatarFile);
 		}
 		try {
-			axios.put(`/api/users/${user.id}`, data, {
+			const response = await axios.put(`/api/users/${user.id}`, data, {
 				headers: {
 					'Content-Type': 'multipart/form-data',
 				},
 			});
+
+			dispatch(
+				updateUserProfile({
+					name: response.data.name,
+					avatarUrl: response.data.avatarUrl,
+				})
+			);
 			navigate('/user-profile');
 		} catch (error) {
 			console.error(error);

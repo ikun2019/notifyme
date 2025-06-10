@@ -64,14 +64,17 @@ exports.updateUserProfile = async (call, callback) => {
         message: '更新に失敗しました'
       });
     }
+
+    const updateData = {};
+    if (avatarUrl) {
+      updateData.avatar_url = avatarUrl;
+    };
     const newProfile = await prisma.profile.upsert({
       where: { userId: userId },
-      update: {
-        avatar_url: avatarUrl,
-      },
+      update: updateData,
       create: {
         userId: userId,
-        avatar_url: avatarUrl,
+        avatar_url: avatarUrl ?? null,
       }
     });
 

@@ -10,11 +10,12 @@ const UserProfile = () => {
 		id: '',
 		name: '',
 		email: '',
-		avaterUrl: '',
+		avatarUrl: '',
 		postCount: 0,
 		followedTags: [],
 		thanksReceived: 0,
 	});
+
 	const { user } = useSelector((state) => state.auth);
 	useEffect(() => {
 		axios.get(`/api/users/${user.id}`).then((result) => {
@@ -23,7 +24,7 @@ const UserProfile = () => {
 				id: result.data.id,
 				name: result.data.name,
 				email: result.data.email,
-				avaterUrl: result.data.avaterUrl,
+				avatarUrl: result.data.avatarUrl,
 				postCount: result.data.postCount,
 				followedTags: result.data.followedTags,
 				thanksReceived: result.data.thanksReceived,
@@ -38,7 +39,7 @@ const UserProfile = () => {
 					<div className="flex items-center space-x-4">
 						<div className="relative">
 							<img
-								src={profile.avaterUrl || '/default-avatar.png'}
+								src={profile.avatarUrl || '/default-avatar.png'}
 								alt="Avatar"
 								className="w-20 h-20 rounded-full object-cover border-2 border-gray-300 shadow-sm"
 							/>
