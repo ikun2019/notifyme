@@ -1,5 +1,6 @@
 const grpc = require('@grpc/grpc-js');
 const prisma = require('../utils/prismaClient');
+const redis = require('../utils/redis/redisClient');
 
 const { PostCountResponse, PostResponse, ListPostsResponse, Tag } = require('../../proto/post_pb');
 const { sendPostCreatedEvent } = require('../utils/kafka/kafkaProducer');
@@ -41,10 +42,23 @@ exports.createPost = async (call, callback) => {
         } : undefined
       },
       include: {
-        tags: true
+        tags: true,
+        tags: {
+          include: {
+            tag: true
+          }
+        }
       }
     });
+    // Kafkaへpush
     await sendPostCreatedEvent('post-created', post);
+    // Redisキャッシュ
+    if (post.tags && post.tags.length > 0) {
+      for (const tagRelation of post.tags) {
+        const tagId = tagRelation.tag.id;
+        await redis.del(`tag:${tagId}:posts`);
+      }
+    };
     const response = new PostResponse();
     response.setId(post.id);
     response.setAuthorId(post.authorId);
@@ -61,7 +75,7 @@ exports.createPost = async (call, callback) => {
   }
 };
 
-// * Posts取得
+// * Posts一覧取得
 exports.listPosts = async (call, callback) => {
   try {
     const posts = await prisma.post.findMany({
@@ -91,6 +105,66 @@ exports.listPosts = async (call, callback) => {
       })
       response.addPosts(item);
     });
+    callback(null, response);
+  } catch (error) {
+    callback({
+      code: grpc.status.INTERNAL,
+      message: error.message
+    });
+  }
+};
+
+// * PostsにTagフィルターをかけて取得
+exports.getPostsByTagId = async (call, callback) => {
+  const { tagId } = call.request.toObject();
+  const cacheKey = `tag:${tagId}:posts`;
+  try {
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      const response = ListPostsResponse.deserializeBinary(Uint8Array.from(parsed));
+      return callback(null, response);
+    }
+
+    const posts = await prisma.post.findMany({
+      where: {
+        tags: {
+          some: {
+            tagId: tagId
+          }
+        }
+      },
+      include: {
+        tags: {
+          include: {
+            tag: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    const response = new ListPostsResponse();
+    posts.forEach((post) => {
+      const item = new PostResponse();
+      item.setId(post.id);
+      item.setAuthorId(post.authorId);
+      item.setContent(post.content);
+      item.setLink(post.link);
+      item.setImageUrl(post.imageUrl);
+      item.setCreatedAt(post.createdAt);
+      post.tags.forEach((tagRelation) => {
+        const tagItem = new Tag();
+        console.log(tagRelation)
+        tagItem.setId(tagRelation.tag.id);
+        tagItem.setName(tagRelation.tag.name);
+        item.addTags(tagItem);
+      });
+      response.addPosts(item);
+    });
+    await redis.set(cacheKey, JSON.stringify([...response.serializeBinary()]), 'EX', 1800);
     callback(null, response);
   } catch (error) {
     callback({

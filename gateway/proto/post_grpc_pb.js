@@ -27,6 +27,17 @@ function deserialize_post_CreatePostRequest(buffer_arg) {
   return post_pb.CreatePostRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_post_GetPostByTagIdRequest(arg) {
+  if (!(arg instanceof post_pb.GetPostByTagIdRequest)) {
+    throw new Error('Expected argument of type post.GetPostByTagIdRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_post_GetPostByTagIdRequest(buffer_arg) {
+  return post_pb.GetPostByTagIdRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_post_ListPostsResponse(arg) {
   if (!(arg instanceof post_pb.ListPostsResponse)) {
     throw new Error('Expected argument of type post.ListPostsResponse');
@@ -103,6 +114,17 @@ var PostServiceService = exports.PostServiceService = {
     responseType: post_pb.ListPostsResponse,
     requestSerialize: serialize_google_protobuf_Empty,
     requestDeserialize: deserialize_google_protobuf_Empty,
+    responseSerialize: serialize_post_ListPostsResponse,
+    responseDeserialize: deserialize_post_ListPostsResponse,
+  },
+  getPostsByTagId: {
+    path: '/post.PostService/GetPostsByTagId',
+    requestStream: false,
+    responseStream: false,
+    requestType: post_pb.GetPostByTagIdRequest,
+    responseType: post_pb.ListPostsResponse,
+    requestSerialize: serialize_post_GetPostByTagIdRequest,
+    requestDeserialize: deserialize_post_GetPostByTagIdRequest,
     responseSerialize: serialize_post_ListPostsResponse,
     responseDeserialize: deserialize_post_ListPostsResponse,
   },

@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { createPost, getAllPosts } = require('../controllers/posts.controller');
+const { createPost, getAllPosts, getPostsByTagId } = require('../controllers/posts.controller');
 
 const upload = require('../middlewares/multer');
 
@@ -8,5 +8,8 @@ router.post('/', upload.single('image'), createPost);
 
 // * GET => /api/posts
 router.get('/', getAllPosts);
+
+// * GET => /api/posts/:tagId
+router.get('/:tagId', getPostsByTagId);
 
 module.exports = router;

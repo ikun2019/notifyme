@@ -210,7 +210,7 @@ const DefaultLayout = () => {
 
 			{/* メイン */}
 			<main className="flex-1 p-4 max-w-3xl mx-auto w-full">
-				<h2 className="text-xl font-semibold mb-4">{pageTitles[location.pathname] || ''}</h2>
+				{/* <h2 className="text-xl font-semibold mb-4">{pageTitles[location.pathname] || ''}</h2> */}
 				<Outlet />
 			</main>
 		</div>

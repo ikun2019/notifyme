@@ -8,6 +8,7 @@ service PostService {
   rpc GetPostCountByAuthor (UserIdRequest) returns (PostCountResponse);
   rpc CreatePost (CreatePostRequest) returns (PostResponse);
   rpc ListPosts (google.protobuf.Empty) returns (ListPostsResponse);
+  rpc GetPostsByTagId (GetPostByTagIdRequest) returns (ListPostsResponse);
 }
 
 // Request
@@ -20,6 +21,9 @@ message CreatePostRequest {
   string link = 3;
   string image_url = 4;
   TagIds tag_ids = 5;
+}
+message GetPostByTagIdRequest {
+  string tag_id = 1;
 }
 
 // Response

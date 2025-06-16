@@ -6,6 +6,9 @@ service UserService {
   rpc GetUserInfo (UserIdRequest) returns (UserInfoResponse);
   rpc CreateUserProfile (UserIdRequest) returns (UserProfileResponse);
   rpc UpdateUserProfile (UpdateUserRequest) returns (UserInfoResponse);
+  rpc FollowTag (FollowTagRequest) returns (FollowTagResponse);
+  rpc UnFollowTag (FollowTagRequest) returns (FollowTagResponse);
+  rpc GetFollowTag (GetFollowTagRequest) returns (GetFollowTagResponse);
 }
 
 // Request
@@ -16,6 +19,13 @@ message UpdateUserRequest {
   string user_id = 1;
   string name = 2;
   string avatar_url = 3;
+}
+message FollowTagRequest {
+  string user_id = 1;
+  string tag_id = 2;
+}
+message GetFollowTagRequest {
+  string user_id = 1;
 }
 
 // Response
@@ -36,6 +46,13 @@ message UserProfileResponse {
   repeated Tag followed_tags = 4;
   int32 thanks_received = 5;
 }
+message FollowTagResponse {
+  bool success = 1;
+}
+message GetFollowTagResponse {
+  repeated string tag_ids = 1;
+}
+
 // Type
 message Tag {
   string id = 1;

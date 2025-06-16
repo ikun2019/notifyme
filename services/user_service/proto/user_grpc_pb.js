@@ -4,6 +4,50 @@
 var grpc = require('@grpc/grpc-js');
 var user_pb = require('./user_pb.js');
 
+function serialize_user_FollowTagRequest(arg) {
+  if (!(arg instanceof user_pb.FollowTagRequest)) {
+    throw new Error('Expected argument of type user.FollowTagRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_user_FollowTagRequest(buffer_arg) {
+  return user_pb.FollowTagRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_user_FollowTagResponse(arg) {
+  if (!(arg instanceof user_pb.FollowTagResponse)) {
+    throw new Error('Expected argument of type user.FollowTagResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_user_FollowTagResponse(buffer_arg) {
+  return user_pb.FollowTagResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_user_GetFollowTagRequest(arg) {
+  if (!(arg instanceof user_pb.GetFollowTagRequest)) {
+    throw new Error('Expected argument of type user.GetFollowTagRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_user_GetFollowTagRequest(buffer_arg) {
+  return user_pb.GetFollowTagRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_user_GetFollowTagResponse(arg) {
+  if (!(arg instanceof user_pb.GetFollowTagResponse)) {
+    throw new Error('Expected argument of type user.GetFollowTagResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_user_GetFollowTagResponse(buffer_arg) {
+  return user_pb.GetFollowTagResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_user_UpdateUserRequest(arg) {
   if (!(arg instanceof user_pb.UpdateUserRequest)) {
     throw new Error('Expected argument of type user.UpdateUserRequest');
@@ -82,6 +126,39 @@ var UserServiceService = exports.UserServiceService = {
     requestDeserialize: deserialize_user_UpdateUserRequest,
     responseSerialize: serialize_user_UserInfoResponse,
     responseDeserialize: deserialize_user_UserInfoResponse,
+  },
+  followTag: {
+    path: '/user.UserService/FollowTag',
+    requestStream: false,
+    responseStream: false,
+    requestType: user_pb.FollowTagRequest,
+    responseType: user_pb.FollowTagResponse,
+    requestSerialize: serialize_user_FollowTagRequest,
+    requestDeserialize: deserialize_user_FollowTagRequest,
+    responseSerialize: serialize_user_FollowTagResponse,
+    responseDeserialize: deserialize_user_FollowTagResponse,
+  },
+  unFollowTag: {
+    path: '/user.UserService/UnFollowTag',
+    requestStream: false,
+    responseStream: false,
+    requestType: user_pb.FollowTagRequest,
+    responseType: user_pb.FollowTagResponse,
+    requestSerialize: serialize_user_FollowTagRequest,
+    requestDeserialize: deserialize_user_FollowTagRequest,
+    responseSerialize: serialize_user_FollowTagResponse,
+    responseDeserialize: deserialize_user_FollowTagResponse,
+  },
+  getFollowTag: {
+    path: '/user.UserService/GetFollowTag',
+    requestStream: false,
+    responseStream: false,
+    requestType: user_pb.GetFollowTagRequest,
+    responseType: user_pb.GetFollowTagResponse,
+    requestSerialize: serialize_user_GetFollowTagRequest,
+    requestDeserialize: deserialize_user_GetFollowTagRequest,
+    responseSerialize: serialize_user_GetFollowTagResponse,
+    responseDeserialize: deserialize_user_GetFollowTagResponse,
   },
 };
 

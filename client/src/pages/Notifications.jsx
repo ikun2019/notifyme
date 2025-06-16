@@ -1,14 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import axios from '../utils/axiosClient';
 
 const Notifications = () => {
+	const [activeTag, setActiveTag] = useState({ name: 'All', id: null });
 	const [notifications, setNotifications] = useState([]);
+	const [tags, setTags] = useState([]);
+	const cacheRef = useRef(null);
+
 	useEffect(() => {
+		if (cacheRef.current) {
+			setNotifications(cacheRef.current);
+			return;
+		}
 		axios
 			.get('/api/posts')
-			.then((response) => setNotifications(response.data))
+			.then((response) => {
+				setNotifications(response.data);
+				const allTags = [
+					...new Map(
+						response.data.flatMap((item) =>
+							item.tags.map((t) => [t.id, { id: t.id, name: t.name }])
+						)
+					).values(),
+				].sort((a, b) => a.name.localeCompare(b.name));
+				setTags(allTags);
+			})
 			.catch((err) => console.error('❌ getAllPosts Error:', err));
 	}, []);
 
@@ -27,76 +45,84 @@ const Notifications = () => {
 		};
 	}, []);
 
+	const handleTagClick = async (tag) => {
+		setActiveTag(tag);
+		if (tag.name === 'All') {
+			const response = await axios.get('/api/posts');
+			setNotifications(response.data);
+			return;
+		}
+		try {
+			const response = await axios.get(`/api/posts/${tag.id}`);
+			setNotifications(response.data);
+		} catch (error) {
+			console.error('❌ getPostsByTagId Error:', error);
+		}
+	};
+
+	console.log(tags);
+
 	return (
-		<div className="max-w-xl mx-auto px-4 py-6">
-			<div className="flex items-center justify-between mb-4">
-				<h1 className="text-2xl font-bold">Notifications</h1>
-				<Link
-					to="/new"
-					className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition"
-				>
-					New Post
-				</Link>
+		<div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+			<h1 className="text-2xl font-bold mb-4">New Notifications</h1>
+
+			{/* タグタブ */}
+			<div className="flex space-x-2 overflow-x-auto border-b pb-2">
+				{[{ name: 'All', id: null }, ...tags].map((tag) => (
+					<button
+						key={tag.name}
+						onClick={() => handleTagClick(tag)}
+						className={`text-sm px-4 py-1 rounded-full whitespace-nowrap transition-all duration-200 ${
+							activeTag.name === tag.name
+								? 'bg-blue-600 text-white shadow-sm'
+								: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+						}`}
+					>
+						# {tag.name}
+					</button>
+				))}
 			</div>
 
-			{notifications.map((item) => (
-				<div key={item.id} className="bg-white border rounded-lg p-4 mb-4 shadow-sm">
-					<div className="flex flex-wrap gap-2 mb-2">
-						{item.tags.map((tag, i) => (
-							<span
-								key={i}
-								className="bg-blue-100 text-blue-600 text-xs font-medium px-2 py-1 rounded-full"
-							>
-								{tag.name}
-							</span>
-						))}
-						<span className="ml-auto text-sm text-gray-400">{item.createdAt}</span>
-					</div>
-
-					{/* 本文テキスト */}
-					<p className="text-sm font-medium mb-2">{item.content}</p>
-
-					{/* 任意リンク */}
-					{item.link && (
-						<a
-							href={`${item.link}`}
-							className="text-sm text-gray-500 underline mb-2 block"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							{item.link}
-						</a>
-					)}
-
-					{/* 任意画像（プレミアムユーザー用） */}
-					{item.imageUrl && (
-						<div className="rounded-md overflow-hidden mb-2">
-							<img src={item.imageUrl} alt="Attached" className="w-full h-auto object-cover" />
+			{/* 通知一覧 */}
+			<div className="space-y-1">
+				{notifications.map((item) => (
+					<div
+						key={item.id}
+						className="bg-white border border-gray-200 rounded-xl p-4 flex items-start gap-4 shadow-sm hover:shadow-md transition"
+					>
+						{item.imageUrl && (
+							<img
+								src={item.imageUrl}
+								alt="thumb"
+								className="w-20 h-20 object-cover rounded-md flex-shrink-0"
+							/>
+						)}
+						<div className="flex-1">
+							<div className="flex flex-wrap gap-2 mb-1">
+								{item.tags.map((tag, i) => (
+									<span
+										key={i}
+										className="bg-blue-100 text-blue-700 text-xs font-medium px-2 py-0.5 rounded-full"
+									>
+										# {tag.name}
+									</span>
+								))}
+							</div>
+							<p className="text-base font-semibold text-gray-800 line-clamp-2">{item.content}</p>
+							{item.link && (
+								<a
+									href={item.link}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-sm text-blue-500 hover:underline mt-1 inline-block"
+								>
+									{item.link}
+								</a>
+							)}
 						</div>
-					)}
-
-					{/* Thanksボタン */}
-					<div className="flex justify-end mt-1">
-						<button className="flex items-center text-sm text-gray-500 hover:text-blue-600 transition">
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								className="h-4 w-4 mr-1"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M5 13l4 4L19 7"
-								/>
-							</svg>
-							Thanks
-						</button>
 					</div>
-				</div>
-			))}
+				))}
+			</div>
 		</div>
 	);
 };

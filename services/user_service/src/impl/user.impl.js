@@ -3,7 +3,7 @@ const grpc = require('@grpc/grpc-js');
 const supabase = require('../utils/supabaseClient');
 const prisma = require('../utils/prismaClient');
 
-const { UserInfoResponse, UserProfileResponse, Tag } = require('../../proto/user_pb');
+const { UserInfoResponse, UserProfileResponse, FollowTagResponse, GetFollowTagResponse, Tag } = require('../../proto/user_pb');
 
 exports.getUserInfo = async (call, callback) => {
   const { userId } = call.request.toObject();
@@ -103,6 +103,8 @@ exports.updateUserProfile = async (call, callback) => {
 
 exports.createUserProfile = async (call, callback) => {
   const { userId } = call.request.toObject();
+  console.log('userId =>', userId);
+
   try {
     const profile = await prisma.profile.create({
       data: {
@@ -120,6 +122,61 @@ exports.createUserProfile = async (call, callback) => {
       tagItem.setName(tag.name);
       response.addFollowedTagsList(tagItem);
     });
+    callback(null, response);
+  } catch (error) {
+    callback({
+      code: grpc.status.INTERNAL,
+      message: error.message
+    });
+  }
+};
+
+exports.followTag = async (call, callback) => {
+  const { userId, tagId } = call.request.toObject();
+  try {
+    await prisma.userFollowedTag.upsert({
+      where: { userId_tagId: { userId: userId, tagId: tagId } },
+      update: {},
+      create: { userId: userId, tagId: tagId }
+    });
+    const response = new FollowTagResponse();
+    response.setSuccess(true);
+    callback(null, response);
+  } catch (error) {
+    callback({
+      code: grpc.status.INTERNAL,
+      message: error.message
+    });
+  }
+};
+
+exports.unFollowTag = async (call, callback) => {
+  const { userId, tagId } = call.request.toObject();
+  try {
+    await prisma.userFollowedTag.delete({
+      where: { userId_tagId: { userId: userId, tagId: tagId } }
+    });
+    const response = new FollowTagResponse();
+    response.setSuccess(true);
+    callback(null, response);
+  } catch (error) {
+    callback({
+      code: grpc.status.INTERNAL,
+      message: error.message
+    });
+  }
+};
+
+exports.getFollowTag = async (call, callback) => {
+  const { userId } = call.request.toObject();
+  console.log(userId);
+
+  try {
+    const tagIds = await prisma.userFollowedTag.findMany();
+    console.log(tagIds);
+
+    const response = new GetFollowTagResponse();
+    response.setTagIdsList(tagIds.map((t) => t.tagId));
     callback(null, response);
   } catch (error) {
     callback({

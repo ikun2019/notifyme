@@ -1,4 +1,4 @@
-const { UserIdRequest, UpdateUserRequest } = require('../../proto/user_pb');
+const { UserIdRequest, UpdateUserRequest, FollowTagRequest, GetFollowTagRequest } = require('../../proto/user_pb');
 const userServiceClient = require('../utils/grpc/userServiceClient');
 const supabase = require('../utils/supabase');
 
@@ -112,5 +112,62 @@ exports.updateUser = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+// * POST => /api/users/follow-tag
+exports.followTag = async (req, res) => {
+  const { userId, tagId } = req.body;
+  try {
+    const request = new FollowTagRequest();
+    request.setUserId(userId);
+    request.setTagId(tagId);
+    const result = await new Promise((resolve, reject) => {
+      userServiceClient.followTag(request, (err, response) => {
+        if (err) return reject(err);
+        resolve(response);
+      });
+    });
+    res.status(200).json({ success: result.getSuccess() });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// * DELETE => /api/users/follow-tag
+exports.unFollowTag = async (req, res) => {
+  const { userId, tagId } = req.body;
+  try {
+    const request = new FollowTagRequest();
+    request.setUserId(userId);
+    request.setTagId(tagId);
+    const result = await new Promise((resolve, reject) => {
+      userServiceClient.unFollowTag(request, (err, response) => {
+        if (err) return reject(err);
+        resolve(response);
+      });
+    });
+    res.status(200).json({ success: result.getSuccess() });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// * GET => /api/users/follow-tag
+exports.getFollowTag = async (req, res) => {
+  console.log('getFollowTag');
+  const { userId } = req.params;
+  try {
+    const request = new GetFollowTagRequest();
+    request.setUserId(userId);
+    const result = await new Promise((resolve, reject) => {
+      userServiceClient.getFollowTag(request, (err, response) => {
+        if (err) return reject(err);
+        resolve(response);
+      });
+    });
+    res.status(200).json({ tagIds: result.getTagIdsList() });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
