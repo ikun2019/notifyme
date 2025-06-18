@@ -9,6 +9,7 @@ const client = require('prom-client');
 // * Import router
 const usersRouter = require('./router/users.router');
 const postsRouter = require('./router/posts.router');
+const tagsRouter = require('./router/tags.router');
 
 // * Expressの初期化
 const app = express();
@@ -72,6 +73,7 @@ app.use((req, res, next) => {
 // * routing
 app.use('/api/users', usersRouter);
 app.use('/api/posts', postsRouter);
+app.use('/api/tags', tagsRouter);
 
 require('./utils/kafka/kafkaToRedis');
 

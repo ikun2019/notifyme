@@ -15,8 +15,6 @@ exports.getUser = async (req, res) => {
       });
     });
 
-    console.log(user.toObject());
-
     res.status(200).json({
       id: user.getId(),
       email: user.getEmail(),
@@ -155,7 +153,6 @@ exports.unFollowTag = async (req, res) => {
 
 // * GET => /api/users/follow-tag
 exports.getFollowTag = async (req, res) => {
-  console.log('getFollowTag');
   const { userId } = req.params;
   try {
     const request = new GetFollowTagRequest();

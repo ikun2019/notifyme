@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
-const { Empty } = require('google-protobuf/google/protobuf/empty_pb')
+const { Empty } = require('google-protobuf/google/protobuf/empty_pb');
 const { CreatePostRequest, TagIds, GetPostByTagIdRequest } = require('../../proto/post_pb');
 const { GetOrCreateTagsRequest } = require('../../proto/tag_pb');
 

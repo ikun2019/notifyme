@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+  schemas =["post","tag","thank","user"]
+}
+
+model Post {
+  id String @id @default(uuid())
+  authorId String
+  content String
+  imageUrl String
+  link String
+  tags PostTag[]
+  createdAt DateTime @default(now())
+  @@schema("post")
+}
+
+model PostTag {
+  postId String
+  tagId String
+  post Post @relation(fields: [postId], references: [id])
+  tag Tag @relation(fields: [tagId], references: [id])
+  @@id([postId, tagId])
+  @@schema("post")
+}
+
+model Tag {
+  id String @id
+  name String
+  posts PostTag[]
+  followers UserFollowedTag[]
+  @@schema("tag")
+}
+
+model Thank {
+  id String @id @default(uuid())
+  messageId String
+  fromUserId String
+  toUserId String
+  createdAt DateTime @default(now())
+  @@schema("thank")
+}
+
+model Profile {
+  userId String @id
+  avatar_url String?
+  post_count Int @default(0)
+  followed_tags UserFollowedTag[]
+  thanks_received Int @default(0)
+  @@schema("user")
+}
+
+model UserFollowedTag {
+  userId String
+  tagId String
+  profile Profile @relation(fields: [userId], references: [userId])
+  tag Tag @relation(fields: [tagId], references: [id])
+  @@id([userId, tagId])
+  @@schema("user")
+}

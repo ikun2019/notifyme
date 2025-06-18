@@ -1,7 +1,7 @@
 const grpc = require('@grpc/grpc-js');
 const fs = require('fs');
 const { TagServiceService } = require('../../proto/tag_grpc_pb');
-const { getOrCreateTags } = require('../impl/tag.impl');
+const { getOrCreateTags, getAllTags } = require('../impl/tag.impl');
 
 const shutdown = (server) => {
   if (server) {
@@ -23,7 +23,8 @@ exports.startServer = () => {
   }], true);
 
   server.addService(TagServiceService, {
-    getOrCreateTags: getOrCreateTags
+    getOrCreateTags: getOrCreateTags,
+    getAllTags: getAllTags,
   })
 
   server.bindAsync('0.0.0.0:50051', creds, (err) => {

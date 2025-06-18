@@ -4,16 +4,23 @@ package tag;
 
 service TagService {
   rpc GetOrCreateTags (GetOrCreateTagsRequest) returns (GetOrCreateTagsResponse);
+  rpc GetAllTags (GetAllTagsRequest) returns (GetAllTagsResponse);
 }
 
 // Request
 message GetOrCreateTagsRequest {
   repeated string names = 1;
 }
+message GetAllTagsRequest {
+  string search = 1;
+}
 
 // Response
 message GetOrCreateTagsResponse {
   repeated Tag tags = 1;
+}
+message GetAllTagsResponse{
+  repeated Tag Tags = 1;
 }
 
 // Type
