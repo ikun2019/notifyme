@@ -36,8 +36,8 @@ model PostTag {
 }
 
 model Tag {
-  id String @id
-  name String
+  id String @id @default(uuid())
+  name String @unique
   posts PostTag[]
   followers UserFollowedTag[]
   @@schema("tag")

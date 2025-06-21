@@ -16,12 +16,11 @@ exports.getUserInfo = async (call, callback) => {
         message: 'User not found.'
       });
     }
-    // profilesテーブルからデータを取得
-    const profileData = await prisma.profile.findUnique({ where: { userId: userId } });
+    // profilesテーブルからデータを取得または自動作成
+    let profileData = await prisma.profile.findUnique({ where: { userId: userId } });
     if (!profileData) {
-      return callback({
-        code: grpc.status.NOT_FOUND,
-        message: 'Profile not found'
+      profileData = await prisma.profile.create({
+        data: { userId: userId }
       });
     }
 

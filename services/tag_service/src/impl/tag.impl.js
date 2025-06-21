@@ -8,7 +8,7 @@ exports.getOrCreateTags = async (call, callback) => {
   try {
     const tags = await Promise.all(
       namesList.map(async (name) => {
-        const existTags = await prisma.tag.findUnique({ where: { name } });
+        const existTags = await prisma.tag.findFirst({ where: { name } });
         if (existTags) return existTags;
         return await prisma.tag.create({ data: { name } });
       })
