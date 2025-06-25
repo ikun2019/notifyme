@@ -1,6 +1,7 @@
 const { UserIdRequest, UpdateUserRequest, FollowTagRequest, GetFollowTagRequest } = require('../../proto/user_pb');
 const userServiceClient = require('../utils/grpc/userServiceClient');
 const supabase = require('../utils/supabase');
+// const redis = require('');
 
 // * GET => /api/users/:userId
 exports.getUser = async (req, res) => {
@@ -151,10 +152,11 @@ exports.unFollowTag = async (req, res) => {
   }
 };
 
-// * GET => /api/users/follow-tag
+// * GET => /api/users/follow-tag/:userId
 exports.getFollowTag = async (req, res) => {
   const { userId } = req.params;
   try {
+
     const request = new GetFollowTagRequest();
     request.setUserId(userId);
     const result = await new Promise((resolve, reject) => {
@@ -163,7 +165,12 @@ exports.getFollowTag = async (req, res) => {
         resolve(response);
       });
     });
-    res.status(200).json({ tagIds: result.getTagIdsList() });
+    const tags = result.getTagsList().map((tag) => ({
+      id: tag.getId(),
+      name: tag.getName()
+    }));
+
+    res.status(200).json(tags);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

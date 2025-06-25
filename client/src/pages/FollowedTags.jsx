@@ -15,7 +15,7 @@ const FollowedTags = () => {
 			axios
 				.get(`/api/users/follow-tag/${user.id}`)
 				.then((response) => {
-					setFollowed(response.data.tagIds || []);
+					setFollowed(response.data || []);
 				})
 				.catch(console.error);
 		}
@@ -43,8 +43,9 @@ const FollowedTags = () => {
 
 	const toggleFollow = async (tag) => {
 		try {
-			if (followed.includes(tag.id)) {
-				setFollowed(followed.filter((t) => t !== tag.id));
+			const isFollowed = followed.some((t) => t.id === tag.id);
+			if (isFollowed) {
+				setFollowed(followed.filter((t) => t.id !== tag.id));
 				await axios.delete(
 					'/api/users/follow-tag',
 					{
@@ -56,7 +57,7 @@ const FollowedTags = () => {
 					{ withCredentials: true }
 				);
 			} else {
-				setFollowed([...followed, tag.id]);
+				setFollowed([...followed, tag]);
 				await axios.post(
 					'/api/users/follow-tag',
 					{
@@ -70,10 +71,6 @@ const FollowedTags = () => {
 			console.error(error);
 		}
 	};
-
-	// const filteredTags = allTags.filter((tag) => {
-	// 	return tag.name.toLowerCase().includes(search.toLowerCase());
-	// });
 
 	return (
 		<div className="max-w-md mx-auto bg-white p-6 rounded-xl shadow-md">
@@ -94,7 +91,9 @@ const FollowedTags = () => {
 			{/* タグ一覧 */}
 			<div className="space-y-2">
 				{allTags.map((tag) => {
-					const isFollowed = followed.includes(tag.id);
+					const isFollowed = followed.some(
+						(followedTag) => followedTag === tag.id || followedTag?.id === tag.id
+					);
 					return (
 						<div
 							key={tag.id}

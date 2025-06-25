@@ -50,7 +50,7 @@ message FollowTagResponse {
   bool success = 1;
 }
 message GetFollowTagResponse {
-  repeated string tag_ids = 1;
+  repeated Tag tags = 1;
 }
 
 // Type

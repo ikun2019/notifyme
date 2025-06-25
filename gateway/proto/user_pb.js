@@ -1648,7 +1648,8 @@ proto.user.GetFollowTagResponse.prototype.toObject = function(opt_includeInstanc
  */
 proto.user.GetFollowTagResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
-    tagIdsList: (f = jspb.Message.getRepeatedField(msg, 1)) == null ? undefined : f
+    tagsList: jspb.Message.toObjectList(msg.getTagsList(),
+    proto.user.Tag.toObject, includeInstance)
   };
 
   if (includeInstance) {
@@ -1686,8 +1687,9 @@ proto.user.GetFollowTagResponse.deserializeBinaryFromReader = function(msg, read
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.addTagIds(value);
+      var value = new proto.user.Tag;
+      reader.readMessage(value,proto.user.Tag.deserializeBinaryFromReader);
+      msg.addTags(value);
       break;
     default:
       reader.skipField();
@@ -1718,41 +1720,43 @@ proto.user.GetFollowTagResponse.prototype.serializeBinary = function() {
  */
 proto.user.GetFollowTagResponse.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getTagIdsList();
+  f = message.getTagsList();
   if (f.length > 0) {
-    writer.writeRepeatedString(
+    writer.writeRepeatedMessage(
       1,
-      f
+      f,
+      proto.user.Tag.serializeBinaryToWriter
     );
   }
 };
 
 
 /**
- * repeated string tag_ids = 1;
- * @return {!Array<string>}
+ * repeated Tag tags = 1;
+ * @return {!Array<!proto.user.Tag>}
  */
-proto.user.GetFollowTagResponse.prototype.getTagIdsList = function() {
-  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 1));
+proto.user.GetFollowTagResponse.prototype.getTagsList = function() {
+  return /** @type{!Array<!proto.user.Tag>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.user.Tag, 1));
 };
 
 
 /**
- * @param {!Array<string>} value
+ * @param {!Array<!proto.user.Tag>} value
  * @return {!proto.user.GetFollowTagResponse} returns this
- */
-proto.user.GetFollowTagResponse.prototype.setTagIdsList = function(value) {
-  return jspb.Message.setField(this, 1, value || []);
+*/
+proto.user.GetFollowTagResponse.prototype.setTagsList = function(value) {
+  return jspb.Message.setRepeatedWrapperField(this, 1, value);
 };
 
 
 /**
- * @param {string} value
+ * @param {!proto.user.Tag=} opt_value
  * @param {number=} opt_index
- * @return {!proto.user.GetFollowTagResponse} returns this
+ * @return {!proto.user.Tag}
  */
-proto.user.GetFollowTagResponse.prototype.addTagIds = function(value, opt_index) {
-  return jspb.Message.addToRepeatedField(this, 1, value, opt_index);
+proto.user.GetFollowTagResponse.prototype.addTags = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 1, opt_value, proto.user.Tag, opt_index);
 };
 
 
@@ -1760,8 +1764,8 @@ proto.user.GetFollowTagResponse.prototype.addTagIds = function(value, opt_index)
  * Clears the list making it empty but non-null.
  * @return {!proto.user.GetFollowTagResponse} returns this
  */
-proto.user.GetFollowTagResponse.prototype.clearTagIdsList = function() {
-  return this.setTagIdsList([]);
+proto.user.GetFollowTagResponse.prototype.clearTagsList = function() {
+  return this.setTagsList([]);
 };
 
 

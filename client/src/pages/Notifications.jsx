@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 import axios from '../utils/axiosClient';
 
@@ -7,7 +8,10 @@ const Notifications = () => {
 	const [activeTag, setActiveTag] = useState({ name: 'All', id: null });
 	const [notifications, setNotifications] = useState([]);
 	const [tags, setTags] = useState([]);
+	const [followedTags, setFollowedTags] = useState([]);
 	const cacheRef = useRef(null);
+
+	const { user } = useSelector((state) => state.auth);
 
 	useEffect(() => {
 		if (cacheRef.current) {
@@ -28,7 +32,12 @@ const Notifications = () => {
 				setTags(allTags);
 			})
 			.catch((err) => console.error('❌ getAllPosts Error:', err));
-	}, []);
+		// フォローしているタグを取得
+		axios
+			.get(`/api/users/follow-tag/${user?.id}`)
+			.then((response) => setFollowedTags(response.data))
+			.catch((err) => console.error('❌ getFollowTag Error:', err));
+	}, [user?.id]);
 
 	useEffect(() => {
 		const socket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
@@ -60,17 +69,15 @@ const Notifications = () => {
 		}
 	};
 
-	console.log(tags);
-
 	return (
 		<div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
 			<h1 className="text-2xl font-bold mb-4">New Notifications</h1>
 
 			{/* タグタブ */}
 			<div className="flex space-x-2 overflow-x-auto border-b pb-2">
-				{[{ name: 'All', id: null }, ...tags].map((tag) => (
+				{[{ name: 'All', id: null }, ...followedTags].map((tag) => (
 					<button
-						key={tag.name}
+						key={tag.id}
 						onClick={() => handleTagClick(tag)}
 						className={`text-sm px-4 py-1 rounded-full whitespace-nowrap transition-all duration-200 ${
 							activeTag.name === tag.name
