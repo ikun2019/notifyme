@@ -20,29 +20,30 @@ const UserProfile = () => {
 	const [search, setSearch] = useState('');
 
 	const { user } = useSelector((state) => state.auth);
+
+	const fetchData = async () => {
+		try {
+			const userRes = await axios.get(`/api/users/${user?.id}`);
+			setProfile((prev) => ({
+				...prev,
+				id: userRes.data.id,
+				name: userRes.data.name,
+				email: userRes.data.email,
+				avatarUrl: userRes.data.avatarUrl,
+				postCount: userRes.data.postCount,
+				followedTags: userRes.data.followedTags,
+				thanksReceived: userRes.data.thanksReceived,
+			}));
+			setFollowedTag(userRes.data.followedTags);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
 	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const [userRes, followedTagsRes] = await Promise.all([
-					axios.get(`/api/users/${user.id}`),
-					axios.get(`/api/users/follow-tag/${user?.id}`),
-				]);
-				setProfile((prev) => ({
-					...prev,
-					id: userRes.data.id,
-					name: userRes.data.name,
-					email: userRes.data.email,
-					avatarUrl: userRes.data.avatarUrl,
-					postCount: userRes.data.postCount,
-					followedTags: userRes.data.followedTags,
-					thanksReceived: userRes.data.thanksReceived,
-				}));
-				setFollowedTag(followedTagsRes.data);
-			} catch (error) {
-				console.error(error);
-			}
-		};
-		fetchData();
+		if (user?.id) {
+			fetchData();
+		}
 	}, [user?.id]);
 
 	useEffect(() => {
@@ -67,9 +68,13 @@ const UserProfile = () => {
 
 	const toggleFollow = async (tag) => {
 		const isFollowed = followedTags.some((t) => t.id === tag.id);
+		if (isFollowed) {
+			setFollowedTag(followedTags.filter((t) => t.id !== tag.id));
+		} else {
+			setFollowedTag([...followedTags, tag]);
+		}
 		try {
 			if (isFollowed) {
-				setFollowedTag(followedTags.filter((t) => t.id !== tag.id));
 				await axios.delete(
 					'/api/users/follow-tag',
 					{
@@ -81,7 +86,6 @@ const UserProfile = () => {
 					{ withCredentials: true }
 				);
 			} else {
-				setFollowedTag([...followedTags, tag]);
 				await axios.post(
 					`/api/users/follow-tag`,
 					{
@@ -91,8 +95,10 @@ const UserProfile = () => {
 					{ withCredentials: true }
 				);
 			}
+			await fetchData();
 		} catch (error) {
 			console.error(error);
+			await fetchData();
 		}
 	};
 
@@ -135,7 +141,7 @@ const UserProfile = () => {
 					<span className="font-semibold">{profile.thanksReceived}</span> Thanks
 				</div>
 				<div>
-					<span className="font-semibold">{profile.followedTags.length}</span> Following
+					<span className="font-semibold">{followedTags.length}</span> Following
 				</div>
 			</div>
 
@@ -150,7 +156,7 @@ const UserProfile = () => {
 					)}
 					{followedTags?.map((tag, index) => (
 						<span
-							key={index}
+							key={tag.id}
 							onClick={() => toggleFollow(tag)}
 							className="bg-blue-100 text-blue-600 text-xs font-medium px-2 py-1 rounded-full cursor-pointer"
 						>
