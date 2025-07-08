@@ -28,9 +28,7 @@ const UserProfile = () => {
 				name: userRes.data.name,
 				email: userRes.data.email,
 				avatarUrl: userRes.data.avatarUrl,
-				// postCount: userRes.data.postCount,
 				followedTags: userRes.data.followedTags,
-				// thanksReceived: userRes.data.thanksReceived,
 			}));
 			setFollowedTag(userRes.data.followedTags);
 		} catch (error) {
