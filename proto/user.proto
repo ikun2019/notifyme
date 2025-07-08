@@ -4,6 +4,7 @@ package user;
 
 service UserService {
   rpc GetUserInfo (UserIdRequest) returns (UserInfoResponse);
+  rpc GetUserStats (UserIdRequest) returns (UserStatsResponse);
   rpc CreateUserProfile (UserIdRequest) returns (UserProfileResponse);
   rpc UpdateUserProfile (UpdateUserRequest) returns (UserInfoResponse);
   rpc FollowTag (FollowTagRequest) returns (FollowTagResponse);
@@ -34,10 +35,8 @@ message UserInfoResponse {
   string email = 2;
   string name = 3;
   string avatar_url = 4;
-  int32 post_count = 5;
-  repeated Tag followed_tags = 6;
-  int32 thanks_received = 7;
-  string created_at = 8;
+  repeated Tag followed_tags = 5;
+  string created_at = 6;
 }
 message UserProfileResponse {
   string user_id = 1;
@@ -51,6 +50,11 @@ message FollowTagResponse {
 }
 message GetFollowTagResponse {
   repeated Tag tags = 1;
+}
+message UserStatsResponse {
+  int32 post_count = 1;
+  int32 thanks_received = 2;
+  int32 total_views = 3;
 }
 
 // Type

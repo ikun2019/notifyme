@@ -92,6 +92,17 @@ function deserialize_user_UserProfileResponse(buffer_arg) {
   return user_pb.UserProfileResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_user_UserStatsResponse(arg) {
+  if (!(arg instanceof user_pb.UserStatsResponse)) {
+    throw new Error('Expected argument of type user.UserStatsResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_user_UserStatsResponse(buffer_arg) {
+  return user_pb.UserStatsResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 
 var UserServiceService = exports.UserServiceService = {
   getUserInfo: {
@@ -104,6 +115,17 @@ var UserServiceService = exports.UserServiceService = {
     requestDeserialize: deserialize_user_UserIdRequest,
     responseSerialize: serialize_user_UserInfoResponse,
     responseDeserialize: deserialize_user_UserInfoResponse,
+  },
+  getUserStats: {
+    path: '/user.UserService/GetUserStats',
+    requestStream: false,
+    responseStream: false,
+    requestType: user_pb.UserIdRequest,
+    responseType: user_pb.UserStatsResponse,
+    requestSerialize: serialize_user_UserIdRequest,
+    requestDeserialize: deserialize_user_UserIdRequest,
+    responseSerialize: serialize_user_UserStatsResponse,
+    responseDeserialize: deserialize_user_UserStatsResponse,
   },
   createUserProfile: {
     path: '/user.UserService/CreateUserProfile',

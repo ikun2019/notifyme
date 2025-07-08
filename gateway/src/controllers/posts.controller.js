@@ -1,6 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 const { Empty } = require('google-protobuf/google/protobuf/empty_pb');
-const { CreatePostRequest, TagIds, GetPostByTagIdRequest } = require('../../proto/post_pb');
+const { CreatePostRequest, TagIds, GetPostByTagIdRequest, UserIdRequest } = require('../../proto/post_pb');
 const { GetOrCreateTagsRequest } = require('../../proto/tag_pb');
 
 const postServiceClient = require('../utils/grpc/postServiceClient');
@@ -138,6 +138,29 @@ exports.getPostsByTagId = async (req, res) => {
       }))
     }));
     res.status(200).json(posts);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// * GET => /api/posts/total-views/:userId
+exports.getTotalViewsByAuthor = async (req, res) => {
+  console.log('getTotalViewsByAuthor');
+  const { userId } = req.params;
+  try {
+    const request = new UserIdRequest();
+    request.setAuthorId(userId);
+    const authStatsResponse = await new Promise((resolve, reject) => {
+      postServiceClient.getAuthStats(request, (err, response) => {
+        if (err) return reject(err);
+        resolve(response);
+      });
+    });
+    res.status(200).json({
+      postCount: authStatsResponse.getPostsCount(),
+      totalViews: authStatsResponse.getTotalViews(),
+      thanksCount: authStatsResponse.getThanksCount()
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

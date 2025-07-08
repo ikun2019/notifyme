@@ -2,7 +2,7 @@ const grpc = require('@grpc/grpc-js');
 const fs = require('fs');
 
 const { PostServiceService } = require('../../proto/post_grpc_pb');
-const { getPostCountByAuthor, createPost, listPosts, getPostsByTagId } = require('../impl/post.impl');
+const { getPostCountByAuthor, createPost, listPosts, getAuthStats } = require('../impl/post.impl');
 const { connectKafka } = require('../utils/kafka/kafkaProducer');
 
 const shutdown = (server) => {
@@ -28,7 +28,7 @@ exports.startServer = () => {
     getPostCountByAuthor: getPostCountByAuthor,
     createPost: createPost,
     listPosts: listPosts,
-    getPostsByTagId: getPostsByTagId,
+    getAuthStats: getAuthStats,
   });
 
   server.bindAsync('0.0.0.0:50051', creds, (err) => {

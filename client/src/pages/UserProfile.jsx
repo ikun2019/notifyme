@@ -11,9 +11,7 @@ const UserProfile = () => {
 		name: '',
 		email: '',
 		avatarUrl: '',
-		postCount: 0,
 		followedTags: [],
-		thanksReceived: 0,
 	});
 	const [followedTags, setFollowedTag] = useState([]);
 	const [allTags, setAllTags] = useState([]);
@@ -30,9 +28,9 @@ const UserProfile = () => {
 				name: userRes.data.name,
 				email: userRes.data.email,
 				avatarUrl: userRes.data.avatarUrl,
-				postCount: userRes.data.postCount,
+				// postCount: userRes.data.postCount,
 				followedTags: userRes.data.followedTags,
-				thanksReceived: userRes.data.thanksReceived,
+				// thanksReceived: userRes.data.thanksReceived,
 			}));
 			setFollowedTag(userRes.data.followedTags);
 		} catch (error) {
@@ -123,6 +121,12 @@ const UserProfile = () => {
 							>
 								Edit Profile
 							</Link>
+							<Link
+								to="/user-dashboard"
+								className="inline-block text-sm text-green-600 hover:underline mt-1 ml-2"
+							>
+								View Dashboard
+							</Link>
 						</div>
 					</div>
 				</form>
@@ -134,12 +138,6 @@ const UserProfile = () => {
 
 			{/* 投稿数・Thanks・フォロー */}
 			<div className="flex gap-6 text-sm text-gray-700 mb-4">
-				<div>
-					<span className="font-semibold">{profile.postCount}</span> Posts
-				</div>
-				<div>
-					<span className="font-semibold">{profile.thanksReceived}</span> Thanks
-				</div>
 				<div>
 					<span className="font-semibold">{followedTags.length}</span> Following
 				</div>

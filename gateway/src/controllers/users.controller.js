@@ -21,12 +21,10 @@ exports.getUser = async (req, res) => {
       email: user.getEmail(),
       name: user.getName(),
       avatarUrl: user.getAvatarUrl(),
-      postCount: user.getPostCount(),
       followedTags: user.getFollowedTagsList().map((tag) => ({
         id: tag.getId(),
         name: tag.getName()
       })),
-      thanksReceived: user.getThanksReceived(),
       createdAt: user.getCreatedAt()
     });
   } catch (error) {

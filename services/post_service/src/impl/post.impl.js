@@ -2,17 +2,51 @@ const grpc = require('@grpc/grpc-js');
 const prisma = require('../utils/prismaClient');
 const redis = require('../utils/redis/redisClient');
 
-const { PostCountResponse, PostResponse, ListPostsResponse, Tag } = require('../../proto/post_pb');
+const { PostResponse, ListPostsResponse, Tag, AuthStatsResponse } = require('../../proto/post_pb');
 const { sendPostCreatedEvent } = require('../utils/kafka/kafkaProducer');
 
-exports.getPostCountByAuthor = async (call, callback) => {
-  const { author_id } = call.request.toObject();
+// * AuthStatsのカウント
+exports.getAuthStats = async (call, callback) => {
+  const { authorId } = call.request.toObject();
+  const cacheKey = `stats:${authorId}`;
   try {
-    const count = await prisma.post.count({
-      where: { authorId: author_id }
-    });
-    const response = new PostCountResponse();
-    response.setCount(count);
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      const response = new AuthStatsResponse();
+      response.setPostsCount(parsed.postsCount);
+      response.setTotalViews(parsed.totalViews);
+      response.setThanksCount(parsed.thanksCount || 0);
+      return callback(null, response);
+    }
+    const [count, views] = await Promise.all([
+      prisma.post.count({
+        where: { authorId: authorId }
+      }),
+      prisma.post.aggregate({
+        _sum: { views: true },
+        where: { authorId: authorId }
+      }),
+    ]);
+
+    const totalViews = views._sum.views || 0;
+    const thanksCount = 0;
+
+    const response = new AuthStatsResponse();
+    response.setPostsCount(count);
+    response.setTotalViews(totalViews);
+    response.setThanksCount(thanksCount);
+
+    await redis.set(
+      cacheKey,
+      JSON.stringify({
+        postsCount: count,
+        totalViews: totalViews,
+        thanksCount: thanksCount
+      }),
+      'EX',
+      1800
+    );
     callback(null, response);
   } catch (error) {
     callback({
@@ -50,6 +84,15 @@ exports.createPost = async (call, callback) => {
         }
       }
     });
+    // profileのpostsを更新
+    await prisma.profile.update({
+      where: { userId: authorId },
+      data: {
+        post_count: { increment: 1 }
+      }
+    });
+    await redis.del(`user:info:${authorId}`);
+    await redis.del(`stats:${authorId}`);
     // Kafkaへpush
     await sendPostCreatedEvent('post-created', post);
     // Redisキャッシュ

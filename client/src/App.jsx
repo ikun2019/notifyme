@@ -19,6 +19,7 @@ import Signup from './pages/auth/Signup';
 import Login from './pages/auth/Login';
 import SendResetPassword from './pages/auth/SendResetPassword';
 import ResetPasswordForm from './pages/auth/ResetPasswordForm';
+import UserDashboard from './pages/UserDashboard';
 
 // * componentsのインポート
 import ProtectedRoute from './components/ProtectedRoute';
@@ -76,6 +77,14 @@ const App = () => {
 						element={
 							<ProtectedRoute>
 								<ProfileEdit />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/user-dashboard"
+						element={
+							<ProtectedRoute>
+								<UserDashboard />
 							</ProtectedRoute>
 						}
 					/>

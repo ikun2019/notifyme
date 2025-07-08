@@ -18,8 +18,6 @@ exports.getUserInfo = async (call, callback) => {
       response.setEmail(user.email);
       response.setName(user.name);
       response.setAvatarUrl(profile.avatarUrl);
-      response.setThanksReceived(profile.thanksReceived);
-      response.setPostCount(profile.post_count);
       response.setCreatedAt(user.createdAt);
       (profile.followedTags || []).forEach((tag) => {
         if (!tag?.id || !tag?.name) return;
@@ -39,6 +37,7 @@ exports.getUserInfo = async (call, callback) => {
       });
     }
     // profilesテーブルからデータを取得または自動作成
+
     let profileData = await prisma.profile.findUnique({
       where: { userId: userId },
       include: {
@@ -48,7 +47,7 @@ exports.getUserInfo = async (call, callback) => {
           }
         }
       }
-    });
+    })
     if (!profileData) {
       profileData = await prisma.profile.create({
         data: { userId: userId }
@@ -65,8 +64,6 @@ exports.getUserInfo = async (call, callback) => {
       },
       profile: {
         avatarUrl: profileData.avatar_url,
-        postCount: profileData.post_count,
-        thanksReceived: profileData.thanks_received,
         followedTags: profileData.followed_tags?.map((t) => {
           if (!t?.tag) return null;
           return { id: t.tag.id, name: t.tag.name };
@@ -81,8 +78,6 @@ exports.getUserInfo = async (call, callback) => {
     response.setEmail(cachedObj.user.email);
     response.setName(cachedObj.user.name);
     response.setAvatarUrl(cachedObj.profile.avatarUrl);
-    response.setPostCount(cachedObj.profile.postCount);
-    response.setThanksReceived(cachedObj.profile.thanksReceived);
     response.setCreatedAt(cachedObj.user.createdAt);
     cachedObj.profile.followedTags?.forEach((tag) => {
       const tagItem = new Tag();
@@ -149,6 +144,23 @@ exports.updateUserProfile = async (call, callback) => {
       code: grpc.status.INTERNAL,
       message: error.message
     });
+  }
+};
+
+exports.getUserStats = async (call, callback) => {
+  const { userId } = call.request.toObject();
+  try {
+    let profileData = await prisma.profile.findUnique({
+      where: { userId: userId }
+    });
+    if (!profileData) {
+      profileData = await prisma.profile.create({
+        data: { userId: userId }
+      });
+    };
+
+  } catch (error) {
+
   }
 };
 
@@ -230,14 +242,6 @@ exports.getFollowTag = async (call, callback) => {
       const parsed = JSON.parse(cached);
       followedTags = parsed?.profile?.followedTags || [];
     }
-    // if (!cached) {
-    //   return callback({
-    //     code: grpc.status.NOT_FOUND,
-    //     message: 'User info not cached'
-    //   });
-    // }
-    // const parsed = JSON.parse(cached);
-    // const followedTags = parsed?.profile?.followedTags || [];
 
     const response = new GetFollowTagResponse();
     followedTags.forEach(({ id, name }) => {

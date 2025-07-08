@@ -16,6 +16,17 @@ function deserialize_google_protobuf_Empty(buffer_arg) {
   return google_protobuf_empty_pb.Empty.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_post_AuthStatsResponse(arg) {
+  if (!(arg instanceof post_pb.AuthStatsResponse)) {
+    throw new Error('Expected argument of type post.AuthStatsResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_post_AuthStatsResponse(buffer_arg) {
+  return post_pb.AuthStatsResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_post_CreatePostRequest(arg) {
   if (!(arg instanceof post_pb.CreatePostRequest)) {
     throw new Error('Expected argument of type post.CreatePostRequest');
@@ -49,17 +60,6 @@ function deserialize_post_ListPostsResponse(buffer_arg) {
   return post_pb.ListPostsResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_post_PostCountResponse(arg) {
-  if (!(arg instanceof post_pb.PostCountResponse)) {
-    throw new Error('Expected argument of type post.PostCountResponse');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_post_PostCountResponse(buffer_arg) {
-  return post_pb.PostCountResponse.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
 function serialize_post_PostResponse(arg) {
   if (!(arg instanceof post_pb.PostResponse)) {
     throw new Error('Expected argument of type post.PostResponse');
@@ -84,16 +84,16 @@ function deserialize_post_UserIdRequest(buffer_arg) {
 
 
 var PostServiceService = exports.PostServiceService = {
-  getPostCountByAuthor: {
-    path: '/post.PostService/GetPostCountByAuthor',
+  getAuthStats: {
+    path: '/post.PostService/GetAuthStats',
     requestStream: false,
     responseStream: false,
     requestType: post_pb.UserIdRequest,
-    responseType: post_pb.PostCountResponse,
+    responseType: post_pb.AuthStatsResponse,
     requestSerialize: serialize_post_UserIdRequest,
     requestDeserialize: deserialize_post_UserIdRequest,
-    responseSerialize: serialize_post_PostCountResponse,
-    responseDeserialize: deserialize_post_PostCountResponse,
+    responseSerialize: serialize_post_AuthStatsResponse,
+    responseDeserialize: deserialize_post_AuthStatsResponse,
   },
   createPost: {
     path: '/post.PostService/CreatePost',

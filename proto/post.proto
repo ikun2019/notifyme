@@ -5,7 +5,7 @@ package post;
 import "google/protobuf/empty.proto";
 
 service PostService {
-  rpc GetPostCountByAuthor (UserIdRequest) returns (PostCountResponse);
+  rpc GetAuthStats (UserIdRequest) returns (AuthStatsResponse);
   rpc CreatePost (CreatePostRequest) returns (PostResponse);
   rpc ListPosts (google.protobuf.Empty) returns (ListPostsResponse);
   rpc GetPostsByTagId (GetPostByTagIdRequest) returns (ListPostsResponse);
@@ -27,8 +27,10 @@ message GetPostByTagIdRequest {
 }
 
 // Response
-message PostCountResponse {
-  int32 count = 1;
+message AuthStatsResponse {
+  int32 posts_count = 1;
+  int32 total_views = 2;
+  int32 thanks_count = 3;
 }
 message PostResponse {
   string id = 1;

@@ -22,7 +22,9 @@ model Post {
   imageUrl String
   link String
   tags PostTag[]
+  views Int @default(0)
   createdAt DateTime @default(now())
+  author Profile @relation("UserPosts",fields: [authorId], references: [userId])
   @@schema("post")
 }
 
@@ -55,7 +57,7 @@ model Thank {
 model Profile {
   userId String @id
   avatar_url String?
-  post_count Int @default(0)
+  posts Post[] @relation("UserPosts")
   followed_tags UserFollowedTag[]
   thanks_received Int @default(0)
   @@schema("user")
